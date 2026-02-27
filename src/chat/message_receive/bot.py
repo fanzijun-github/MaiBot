@@ -245,9 +245,20 @@ class ChatBot:
                     message_data["message_info"]["group_info"]["group_id"]
                 )
             if message_data["message_info"].get("user_info") is not None:
-                message_data["message_info"]["user_info"]["user_id"] = str(
-                    message_data["message_info"]["user_info"]["user_id"]
+                # 在群聊中优先使用群名片作为显示昵称 by zijun
+                user_info_dict = message_data["message_info"]["user_info"]
+                user_info_dict["user_id"] = str(user_info_dict["user_id"])
+                group_exists = bool(message_data["message_info"].get("group_info"))
+                card_name = (
+                    user_info_dict.get("user_cardname")
+                    or user_info_dict.get("card")
+                    or user_info_dict.get("cardname")
                 )
+                if card_name:
+                    user_info_dict["user_cardname"] = card_name
+                    user_info_dict["user_nickname"] = card_name
+                if group_exists and card_name:
+                    user_info_dict["user_nickname"] = card_name
             # print(message_data)
             # logger.debug(str(message_data))
             message = MessageRecv(message_data)
